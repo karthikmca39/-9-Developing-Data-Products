@@ -1,14 +1,156 @@
 ---
-title: "R Markdown and Leaflet"
+title: "FANCY PLOTS with Plotly"
 author: "Karthik Theivendran"
-date: "July 19, 2018"
-output: html_document
+date: "June 19, 2018"
+output: 
+  ioslides_presentation: 
+    keep_md: yes
 ---
-Create a web page using R Markdown that features a map created with Leaflet.
 
-```{r}
-library(leaflet)
-leaflet() %>%
-  addTiles() %>% 
-  addMarkers(lat=44.814875, lng= 20.448346, popup='City of work')
+##Introduction
+
+
+* Creating a web page presentation using R Markdown that features a plot created with Plotly.
+
+
+* This presentaion includes 2 different plots with code attached, where i'm trying to show the real benefit of using "Plotly" package.
+
+```{r inti, eval=TRUE}
+#install.packages("plotly")
+library(plotly)
+
 ```
+
+##Mtcars 3D plot
+
+```{r plot1, echo=TRUE, eval=FALSE}
+
+data("mtcars") ##attaching required data
+
+##re-evaluating [am] parameter and factoring it
+mtcars$am[which(mtcars$am == 0)] <- 'Automatic'
+mtcars$am[which(mtcars$am == 1)] <- 'Manual'
+mtcars$am <- as.factor(mtcars$am)
+
+p <- plot_ly(mtcars, x = ~wt, y = ~hp,
+             z = ~qsec, color = ~am,
+             colors = c('#BF382A',
+                        '#0C4B8E')) %>%
+    add_markers() %>% 
+    layout(scene = list(
+        xaxis = list(title = 'Weight'),
+        yaxis = list(title = 'Gross horsepower'),
+        zaxis = list(title = '1/4 mile time'))); p
+```
+
+##Mtcars 3D plot [continue]
+
+```{r plot1_show, echo=FALSE,eval = TRUE}
+
+data("mtcars")
+
+mtcars$am[which(mtcars$am == 0)] <- 'Automatic'
+mtcars$am[which(mtcars$am == 1)] <- 'Manual'
+mtcars$am <- as.factor(mtcars$am)
+
+p <- plot_ly(mtcars, x = ~wt, y = ~hp, z = ~qsec, color = ~am, colors = c('#BF382A', '#0C4B8E')) %>%
+  add_markers() %>%
+  layout(scene = list(xaxis = list(title = 'Weight'),
+                     yaxis = list(title = 'Gross horsepower'),
+                     zaxis = list(title = '1/4 mile time'))); p
+```
+
+##Life Expectancy and GDP
+
+```{r LE+GDP, echo=TRUE, eval=FALSE}
+
+#downloading data
+data <- read.csv("https://raw.githubusercontent.com/plotly
+                 /datasets/master/gapminderDataFiveYear.csv")
+
+#subsetting the data
+data_2007 <- data[which(data$year == 2007), ]
+#ordering based on 2 parameters
+data_2007 <- data_2007[order(data_2007$continent, 
+                             data_2007$country),] 
+slope <- 2.666051223553066e-05
+#defining bubble's based on population size
+data_2007$size <- sqrt(data_2007$pop * slope) 
+#definig colors variable
+colors <- c('#4AC6B7', '#1972A4', '#965F8A', '#FF7070', '#C61951') 
+
+```
+
+
+##Life Expectancy and GDP [continue]
+
+```{r LE+GDP2, echo=TRUE, eval=FALSE}
+p <- plot_ly(data_2007, x = ~gdpPercap, y = ~lifeExp, color = ~continent,
+             size = ~size, colors = colors,type = 'scatter', mode = 'markers', 
+             sizes = c(min(data_2007$size), max(data_2007$size)),
+             marker = list(symbol = 'circle', sizemode = 'diameter',
+                           line = list(width = 2, color = '#FFFFFF')),
+             text = ~paste('Country:', country, '<br>Life Expectancy:', lifeExp,
+                           '<br>GDP:', gdpPercap,'<br>Pop.:', pop)) %>%
+    layout(title = 'Life Expectancy v. Per Capita GDP, 2007',
+           xaxis = list(title = 'GDP per capita (2000 dollars)',
+                        gridcolor = 'rgb(255, 255, 255)',
+                        range = c(2.003297660701705, 5.191505530708712),
+                        type = 'log', zerolinewidth = 1, ticklen = 5, gridwidth = 2),
+           yaxis = list(title = 'Life Expectancy (years)', gridcolor = 'rgb(255, 255, 255)',
+                        range = c(36.12621671352166, 91.72921793264332),
+                        zerolinewidth = 1, ticklen = 5, gridwith = 2),
+           paper_bgcolor = 'rgb(243, 243, 243)',
+           plot_bgcolor = 'rgb(243, 243, 243)')
+```
+
+
+##Life Expectancy and GDP [continue]
+```{r LE+GDP3, echo=FALSE, eval=TRUE}
+
+#downloading data
+data <- read.csv("https://raw.githubusercontent.com/plotly
+                 /datasets/master/gapminderDataFiveYear.csv")
+
+#subsetting the data
+data_2007 <- data[which(data$year == 2007), ]
+#ordering based on 2 parameters
+data_2007 <- data_2007[order(data_2007$continent, 
+                             data_2007$country),] 
+slope <- 2.666051223553066e-05
+#defining bubble's based on population size
+data_2007$size <- sqrt(data_2007$pop * slope) 
+#definig colors variable
+colors <- c('#4AC6B7', '#1972A4', '#965F8A', '#FF7070', '#C61951') 
+
+p <- plot_ly(data_2007, x = ~gdpPercap, y = ~lifeExp, color = ~continent,
+             size = ~size, colors = colors,type = 'scatter', mode = 'markers', 
+             sizes = c(min(data_2007$size), max(data_2007$size)),
+             marker = list(symbol = 'circle', sizemode = 'diameter',
+                           line = list(width = 2, color = '#FFFFFF')),
+             text = ~paste('Country:', country, '<br>Life Expectancy:', lifeExp,
+                           '<br>GDP:', gdpPercap,'<br>Pop.:', pop)) %>%
+    layout(title = 'Life Expectancy v. Per Capita GDP, 2007',
+           xaxis = list(title = 'GDP per capita (2000 dollars)',
+                        gridcolor = 'rgb(255, 255, 255)',
+                        range = c(2.003297660701705, 5.191505530708712),
+                        type = 'log', zerolinewidth = 1, ticklen = 5, gridwidth = 2),
+           yaxis = list(title = 'Life Expectancy (years)', gridcolor = 'rgb(255, 255, 255)',
+                        range = c(36.12621671352166, 91.72921793264332),
+                        zerolinewidth = 1, ticklen = 5, gridwith = 2),
+           paper_bgcolor = 'rgb(243, 243, 243)',
+           plot_bgcolor = 'rgb(243, 243, 243)')
+p
+
+```
+
+
+##Refrences
+
+*Find various 3D charts at [here](https://goo.gl/Kb6ASp)
+
+*Find fancy bubble charts at [here](https://goo.gl/bjvTdz)
+
+
+
+**THANK YOU**
